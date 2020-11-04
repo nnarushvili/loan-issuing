@@ -1,5 +1,10 @@
 package ge.nika;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,24 +13,33 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
-public class Operator {
+public class Operator implements UserDetails {
     @Id
     @GeneratedValue
     private Long id;
 
+    @NotNull
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @NotNull
     @Column(name = "password", nullable = false)
     private String password;
 
+    @NotNull
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @NotNull
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
@@ -95,6 +109,7 @@ public class Operator {
         this.loanApplications.add(loanApplication);
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
@@ -103,11 +118,45 @@ public class Operator {
         this.username = username;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_OPERATOR"));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public Operator hashPassword() throws NoSuchAlgorithmException {
+//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        String hashedPassword = passwordEncoder.encode(this.password);
+//        setPassword(hashedPassword);
+        return this;
     }
 }

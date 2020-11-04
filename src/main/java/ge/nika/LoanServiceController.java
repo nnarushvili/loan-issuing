@@ -1,18 +1,12 @@
 package ge.nika;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class LoanServiceController {
@@ -23,14 +17,14 @@ public class LoanServiceController {
         this.loanApplicationRepository = loanApplicationRepository;
     }
 
-    @PostMapping("/loanapplications")
-    public LoanApplication createLoanApplication(@RequestBody @NotNull @Valid LoanApplication loanApplication) {
-        return loanApplicationRepository.save(loanApplication);
-    }
-
     @GetMapping("/loanapplications")
     public List<LoanApplication> getLoanApplications() {
         return loanApplicationRepository.findAll(Sort.by(Sort.Direction.ASC, "firstName"));
+    }
+
+    @PostMapping("/loanapplications")
+    public LoanApplication createLoanApplication(@RequestBody @NotNull @Valid LoanApplication loanApplication) {
+        return loanApplicationRepository.save(loanApplication.calculateScoreAndSetStatus());
     }
 
     @DeleteMapping("/loanapplications/{id}")
@@ -38,14 +32,19 @@ public class LoanServiceController {
         loanApplicationRepository.deleteById(id);
     }
 
-    @PatchMapping("/loanapplications/{id}")
-    public LoanApplication updateLoanApplication(@PathVariable Long id,@RequestBody @NotNull @Valid LoanApplicationUpdateDTO dto) {
-        Optional<LoanApplication> loanApplication = loanApplicationRepository.findById(id);
-        if (loanApplication.isPresent()) {
-            //TODO: finish implementation
-            return null;
-        }
-        throw new LoanApplicationNotFoundException();
+    @PutMapping("/loanapplications/{id}")
+    public LoanApplication updateLoanApplication(@PathVariable Long id, @RequestBody @NotNull @Valid LoanApplicationUpdateDTO dto) {
+        return loanApplicationRepository.findById(id)
+                .map(
+                        loanApplication -> {
+                            loanApplication.setLoanScore(dto.getLoanScore());
+                            if (loanApplication.getStatus() == LoanApplicationStatus.MANUAL) {
+                                loanApplication.setStatus(dto.getStatus());
+                            }
+                            return loanApplicationRepository.save(loanApplication);
+                        }
+                )
+                .orElseThrow(LoanApplicationNotFoundException::new);
     }
 
 }

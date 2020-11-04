@@ -1,6 +1,8 @@
 package ge.nika;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Calendar;
 
 @Entity
 @Table(name = "loan_application")
@@ -57,10 +60,12 @@ public class LoanApplication {
     @Column(name = "requested_term", nullable = false)
     private Long requestedTermInDays;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Enumerated(EnumType.STRING)
     @Column(name = "loan_status", nullable = false)
     private LoanApplicationStatus status;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "loan_score", nullable = false)
     private BigDecimal loanScore;
 
@@ -154,5 +159,30 @@ public class LoanApplication {
 
     public void setLoanScore(BigDecimal loanScore) {
         this.loanScore = loanScore;
+    }
+
+    public LoanApplication calculateScoreAndSetStatus() {
+        int sumOfLetterPositions = 0;
+        for (char c : this.firstName.toLowerCase().toCharArray()) {
+            sumOfLetterPositions += (c - 96);
+        }
+
+        int yearOfBirth = this.birthDate.getYear();
+        int monthOfBirth = this.birthDate.getMonthValue();
+        int dayOfYear = this.birthDate.getDayOfYear();
+
+        BigDecimal firstPartOfEquation = this.salary.multiply(BigDecimal.valueOf(1.5)).subtract(this.monthlyLiability.multiply(BigDecimal.valueOf(3)));
+        BigDecimal secondPartOfEquation = BigDecimal.valueOf(sumOfLetterPositions + yearOfBirth - monthOfBirth - dayOfYear);
+
+        setLoanScore(firstPartOfEquation.add(secondPartOfEquation));
+        if (this.loanScore.intValue() < 2500) {
+            setStatus(LoanApplicationStatus.REJECTED);
+        } else if (this.loanScore.intValue() > 3500) {
+            setStatus(LoanApplicationStatus.APPROVED);
+        } else {
+            setStatus(LoanApplicationStatus.MANUAL);
+        }
+
+        return this;
     }
 }
