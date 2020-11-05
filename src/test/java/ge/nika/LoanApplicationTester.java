@@ -1,11 +1,13 @@
-package ge.nika.test;
+package ge.nika;
 
 import ge.nika.loanapplication.LoanApplication;
 import ge.nika.loanapplication.LoanApplicationStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import static org.junit.Assert.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class LoanApplicationTester {
@@ -34,13 +37,13 @@ public class LoanApplicationTester {
     }
 
     @Test
-    public void testAuthorizedLoanApplicationsCall() throws  Exception{
+    public void testAuthorizedLoanApplicationsCall() throws Exception {
         mockMvc.perform(get("/loanapplications").header("Authorization", "Basic b3AxOnBhc3Mx"))
                 .andExpect(content().contentType("application/json"));
     }
 
     @Test
-    public void testLoanApplicationScoreCalculation() throws Exception {
+    public void testLoanApplicationScoreCalculation() {
         LoanApplication loanApplication = new LoanApplication();
 
         loanApplication.setBirthDate(LocalDate.parse("01/03/1998", DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -54,7 +57,7 @@ public class LoanApplicationTester {
     }
 
     @Test
-    public void testLoanApplicationStatusCalculation() throws Exception {
+    public void testLoanApplicationStatusCalculation() {
         LoanApplication loanApplication = new LoanApplication();
 
         loanApplication.setBirthDate(LocalDate.parse("01/03/1998", DateTimeFormatter.ofPattern("dd/MM/yyyy")));
