@@ -1,4 +1,4 @@
-package ge.nika;
+package ge.nika.operator;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

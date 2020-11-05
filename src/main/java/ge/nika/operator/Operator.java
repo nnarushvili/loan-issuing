@@ -1,9 +1,9 @@
-package ge.nika;
+package ge.nika.operator;
 
+import ge.nika.loanapplication.LoanApplication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 public class Operator implements UserDetails {
@@ -71,6 +70,13 @@ public class Operator implements UserDetails {
     }
 
     public Operator() {
+    }
+
+    public Operator(@NotNull String username, @NotNull String password, @NotNull String firstName, @NotNull String lastName) {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public Long getId() {

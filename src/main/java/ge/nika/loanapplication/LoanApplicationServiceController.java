@@ -1,7 +1,6 @@
-package ge.nika;
+package ge.nika.loanapplication;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -9,11 +8,11 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
-public class LoanServiceController {
+public class LoanApplicationServiceController {
 
     private final LoanApplicationRepository loanApplicationRepository;
 
-    public LoanServiceController(LoanApplicationRepository loanApplicationRepository) {
+    public LoanApplicationServiceController(LoanApplicationRepository loanApplicationRepository) {
         this.loanApplicationRepository = loanApplicationRepository;
     }
 
@@ -24,6 +23,11 @@ public class LoanServiceController {
 
     @PostMapping("/loanapplications")
     public LoanApplication createLoanApplication(@RequestBody @NotNull @Valid LoanApplication loanApplication) {
+        return loanApplicationRepository.save(loanApplication.calculateScoreAndSetStatus());
+    }
+
+    @PostMapping("/loanapplications/client")
+    public LoanApplication createLoanApplicationFromClient(@RequestBody @NotNull @Valid LoanApplication loanApplication) {
         return loanApplicationRepository.save(loanApplication.calculateScoreAndSetStatus());
     }
 

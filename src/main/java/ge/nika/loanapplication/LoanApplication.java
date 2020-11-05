@@ -1,7 +1,6 @@
-package ge.nika;
+package ge.nika.loanapplication;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
@@ -15,7 +14,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Calendar;
 
 @Entity
 @Table(name = "loan_application")
@@ -71,6 +69,17 @@ public class LoanApplication {
 
     public LoanApplication() {
 
+    }
+
+    public LoanApplication(String firstName, String lastName, LocalDate birthDate, String employer, BigDecimal salary, BigDecimal monthlyLiability, BigDecimal requestedAmount, Long requestedTermInDays) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.employer = employer;
+        this.salary = salary;
+        this.monthlyLiability = monthlyLiability;
+        this.requestedAmount = requestedAmount;
+        this.requestedTermInDays = requestedTermInDays;
     }
 
     public Long getId() {

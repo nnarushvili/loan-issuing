@@ -1,4 +1,4 @@
-package ge.nika;
+package ge.nika.loanapplication;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
