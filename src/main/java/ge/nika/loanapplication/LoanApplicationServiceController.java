@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class LoanApplicationServiceController {
@@ -17,8 +18,19 @@ public class LoanApplicationServiceController {
     }
 
     @GetMapping("/loanapplications")
-    public List<LoanApplication> getLoanApplications() {
-        return loanApplicationRepository.findAll(Sort.by(Sort.Direction.ASC, "firstName"));
+    public List<LoanApplication> getLoanApplications(@RequestParam Map<String, String> queryParameters) {
+        String orderBy = queryParameters.get("orderBy");
+        String directionStr = queryParameters.get("direction");
+        if (orderBy == null) {
+            orderBy = "firstName";
+        }
+
+        Sort.Direction direction = Sort.Direction.ASC;
+        if (directionStr != null) {
+            direction = Sort.Direction.valueOf(directionStr);
+        }
+        return loanApplicationRepository.findAll(Sort.by(direction, orderBy));
+
     }
 
     @PostMapping("/loanapplications")
